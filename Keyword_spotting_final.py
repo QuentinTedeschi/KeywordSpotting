@@ -36,6 +36,7 @@ def detect_triggerword_spectrum(x):
     x  = x.swapaxes(0,1)
     x = np.expand_dims(x, axis=0)
     predictions = model.predict(x)
+    print(x)
     return predictions.reshape(-1)
 
 def has_new_triggerword(predictions, chunk_duration, feed_duration, threshold=0.5):
@@ -51,10 +52,10 @@ def has_new_triggerword(predictions, chunk_duration, feed_duration, threshold=0.
     return False
 
 
-chunk_duration = 0.5
+chunk_duration = 1
 fs = 44100
 chunk_samples = int(fs * chunk_duration)
-feed_duration = 10
+feed_duration = 2
 feed_samples = int(fs * feed_duration)
 
 assert feed_duration/chunk_duration == int(feed_duration/chunk_duration)
@@ -101,7 +102,7 @@ stream.start_stream()
 try:
     while run:
         data = q.get()
-        spectrum = get_spectrogram(data)
+        spectrum = mic_spectrogram(data)
         preds = detect_triggerword_spectrum(spectrum)
         new_trigger = has_new_triggerword(preds, chunk_duration, feed_duration)
         if new_trigger:
